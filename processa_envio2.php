@@ -1,56 +1,55 @@
 <?php
 
-require "./bibliotecas/PHPMailer/Exception.php";
-require "./bibliotecas/PHPMailer/OAuth.php";
-require "./bibliotecas/PHPMailer/PHPMailer.php";
-require "./bibliotecas/PHPMailer/POP3.php";
-require "./bibliotecas/PHPMailer/SMTP.php";
+	require "./bibliotecas/PHPMailer/Exception.php";
+	require "./bibliotecas/PHPMailer/OAuth.php";
+	require "./bibliotecas/PHPMailer/PHPMailer.php";
+	require "./bibliotecas/PHPMailer/POP3.php";
+	require "./bibliotecas/PHPMailer/SMTP.php";
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+	use PHPMailer\PHPMailer\PHPMailer;
+	use PHPMailer\PHPMailer\Exception;
 
-//print_r($_POST);
+	//print_r($_POST);
 
-class Mensagem {
-    private $para= null;
-    private $assunto= null;
-    private $mensagem= null;
+	class Mensagem {
+		private $para = null;
+		private $assunto = null;
+		private $mensagem = null;
 
-    public function __get($atributo){
-        return $this->$atributo;
-    }
+		public function __get($atributo) {
+			return $this->$atributo;
+		}
 
-    public function __set($atributo, $valor){
-        $this->$atributo = $valor;
-}
+		public function __set($atributo, $valor) {
+			$this->$atributo = $valor;
+		}
 
+		public function mensagemValida() {
+			if(empty($this->para) || empty($this->assunto) || empty($this->mensagem)){
+				return false;
+			}
 
-    public function mensagemValida() {
-        if(empty($this->para) || empty($this->assunto) || empty($this->mensagem)) {
-            return false;
-        }
+			return true;
+		}
+	}
 
-        return true;
-    }
-}
+	$mensagem = new Mensagem();
 
-$mensagem = new Mensagem();
+	$mensagem->__set('para', $_POST['para']);
+	$mensagem->__set('assunto', $_POST['assunto']);
+	$mensagem->__set('mensagem', $_POST['mensagem']);
 
-$mensagem->__set('para', $_POST['para']);
-$mensagem->__set('assunto', $_POST['assunto']);
-$mensagem->__set('mensagem', $_POST['mensagem']);
+	//print_r($mensagem);
 
-//print_r($mensagem);
+	if(!$mensagem->mensagemValida()) {
+		echo 'Mensagem não é válida';
+		die();
+	}
 
-if(!$mensagem->mensagemValida()) {
-    echo 'Mensagem não é valida';
-    die();
-}
-
-    $mail = new PHPMailer(true);
+	$mail = new PHPMailer(true);
 	try {
 			//Server settings
-			$mail->SMTPDebug = 2;                      //Enable verbose debug output
+			$mail->SMTPSecure='tls';                      //Enable verbose debug output
 			$mail->isSMTP();                                            //Send using SMTP
 			$mail->Host       = 'smtp.example.com';                     //Set the SMTP server to send through
 			$mail->SMTPAuth   = true;                                   //Enable SMTP authentication
@@ -83,4 +82,3 @@ if(!$mensagem->mensagemValida()) {
 			echo "Não foi possivel enviar este e-mail! Por favor tente novamente mais tarde.";
 			echo 'Detalhes do erro: ' . $mail->ErrorInfo;
 	}
-?>
